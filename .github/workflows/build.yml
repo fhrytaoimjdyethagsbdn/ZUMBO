@@ -25,8 +25,7 @@ jobs:
         with:
           submodules: recursive
 
-      - name: Clone JUCE 8 (Required)
-        run: git clone --depth 1 --branch 8.0.4 https://github.com juce_src
+      - name: Clone JUCE 8
         run: git clone --depth 1 --branch 8.0.4 https://github.com juce_src
 
       - name: Install Build Tools (Windows)
@@ -34,7 +33,7 @@ jobs:
         uses: ilammy/msvc-dev-cmd@v1
 
       - name: Configure CMake
-        run: cmake -B build -DCMAKE_BUILD_TYPE=Release -DJUCE_PATH=${{ github.workspace }}/juce_src
+        run: cmake -B build -DCMAKE_BUILD_TYPE=Release -DJUCE_PATH="${{ github.workspace }}/juce_src"
 
       - name: Build ZUMBO Plugin
         run: cmake --build build --config Release --parallel
@@ -44,7 +43,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: ZUMBO-Windows-VST3
-          path: build/ZUMBO_artefacts/Release/VST3/
+          path: build/ZUMBO_artifacts/Release/VST3/
           if-no-files-found: warn
 
       - name: Upload ZUMBO VST3 (macOS)
@@ -52,5 +51,5 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: ZUMBO-macOS-VST3
-          path: build/ZUMBO_artefacts/Release/VST3/
+          path: build/ZUMBO_artifacts/Release/VST3/
           if-no-files-found: warn
