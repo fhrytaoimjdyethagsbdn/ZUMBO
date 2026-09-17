@@ -7,15 +7,8 @@ on:
 
 jobs:
   build:
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - os: windows-latest
-            name: Windows
-
-    runs-on: ${{ matrix.os }}
-    name: Build (${{ matrix.name }})
+    runs-on: windows-latest
+    name: Build (Windows)
 
     steps:
       - name: Checkout ZUMBO repo
@@ -27,7 +20,6 @@ jobs:
         run: git clone --depth 1 --branch 8.0.4 https://github.com juce_src
 
       - name: Install Build Tools (Windows)
-        if: matrix.os == 'windows-latest'
         uses: ilammy/msvc-dev-cmd@v1
 
       - name: Configure CMake
@@ -36,8 +28,7 @@ jobs:
       - name: Build ZUMBO Plugin
         run: cmake --build build --config Release --parallel
 
-      - name: Upload ZUMBO VST3 (Windows)
-        if: matrix.os == 'windows-latest'
+      - name: Upload ZUMBO VST3
         uses: actions/upload-artifact@v4
         with:
           name: ZUMBO-Windows-VST3
