@@ -1,0 +1,55 @@
+name: Build ZUMBO Synthesizer
+
+on:
+  push:
+    branches: [ main, master ]
+  workflow_dispatch: {}
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: windows-latest
+            name: Windows
+          - os: macos-latest
+            name: macOS
+
+    runs-on: ${{ matrix.os }}
+    name: Build (${{ matrix.name }})
+
+    steps:
+      - name: Checkout ZUMBO repo
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Clone JUCE 8 (Required)
+        run: git clone --depth 1 --branch 8.0.4 https://github.com juce_src
+
+      - name: Install Build Tools (Windows)
+        if: matrix.os == 'windows-latest'
+        uses: ilammy/msvc-dev-cmd@v1
+
+      - name: Configure CMake
+        run: cmake -B build -DCMAKE_BUILD_TYPE=Release -DJUCE_PATH=${{ github.workspace }}/juce_src
+
+      - name: Build ZUMBO Plugin
+        run: cmake --build build --config Release --parallel
+
+      - name: Upload ZUMBO VST3 (Windows)
+        if: matrix.os == 'windows-latest'
+        uses: actions/upload-artifact@v4
+        with:
+          name: ZUMBO-Windows-VST3
+          path: build/ZUMBO_artefacts/Release/VST3/
+          if-no-files-found: warn
+
+      - name: Upload ZUMBO VST3 (macOS)
+        if: matrix.os == 'macos-latest'
+        uses: actions/upload-artifact@v4
+        with:
+          name: ZUMBO-macOS-VST3
+          path: build/ZUMBO_artefacts/Release/VST3/
+          if-no-files-found: warn
