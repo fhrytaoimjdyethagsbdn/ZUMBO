@@ -27,6 +27,7 @@ jobs:
 
       - name: Clone JUCE 8 (Required)
         run: git clone --depth 1 --branch 8.0.4 https://github.com juce_src
+        run: git clone --depth 1 --branch 8.0.4 https://github.com juce_src
 
       - name: Install Build Tools (Windows)
         if: matrix.os == 'windows-latest'
