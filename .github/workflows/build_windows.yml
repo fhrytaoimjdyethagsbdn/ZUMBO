@@ -1,0 +1,36 @@
+name: Build ZUMBO Windows VST3
+
+on:
+  push:
+    branches: [ main, master ]
+  workflow_dispatch: {}
+
+jobs:
+  build:
+    runs-on: windows-latest
+    name: Build VST3 Target
+
+    steps:
+      - name: Checkout Source Code
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Clone JUCE 8 Framework
+        run: git clone --depth 1 --branch 8.0.4 https://github.com juce_src
+
+      - name: Setup Windows Compiler
+        uses: ilammy/msvc-dev-cmd@v1
+
+      - name: Configure CMake Project
+        run: cmake -B build -DCMAKE_BUILD_TYPE=Release -DJUCE_PATH="${{ github.workspace }}/juce_src"
+
+      - name: Build Plugin Binary
+        run: cmake --build build --config Release --parallel
+
+      - name: Upload Windows VST3 Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ZUMBO-Windows-VST3
+          path: build/ZUMBO_artefacts/Release/VST3/
+          if-no-files-found: warn
